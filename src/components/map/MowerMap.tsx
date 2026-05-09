@@ -25,7 +25,9 @@ import DockingStationMarker from './DockingStationMarker';
 import {DrawControl} from './DrawControl';
 import {drawStyles} from './drawStyles';
 import {AreaSettingsDialog} from './edit/AreaSettingsDialog';
+import {DownloadButton} from './edit/DownloadButton';
 import EditControls from './edit/EditControls';
+import {UploadButton} from './edit/UploadButton';
 import {mapStyles} from './mapStyles';
 import MowerMarker from './MowerMarker';
 import TeleopControls from './teleop/TeleopControls';
@@ -161,6 +163,8 @@ export function MowerMap({mapData, saveMapToMower, sx}: MowerMapProps) {
           active={showAreaList}
           onClick={() => setShowAreaList(!showAreaList)}
         />
+        <DownloadButton />
+        <UploadButton />
 
         {/* Overlays */}
         {!isMobile && showAreaList && (
