@@ -1,6 +1,7 @@
 import MapboxDraw, {type DrawMode} from '@mapbox/mapbox-gl-draw';
+import {featureCollection} from '@turf/helpers';
 import {Feature, FeatureCollection} from 'geojson';
-import {Draft} from 'immer';
+import {Draft, produce} from 'immer';
 import {useMap as useMapLibreMap} from 'maplibre-react-components';
 import {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import {Updater, useImmer} from 'use-immer';
@@ -38,11 +39,24 @@ type Workflow = SplitPolygonWorkflow;
 
 const MAX_HISTORY_STEPS = 10;
 
+export function displaySortKey(idx: number, type: string | undefined, features: Feature[]): number {
+  return (type === 'obstacle' ? features.length : 0) + idx;
+}
+
+export function withDisplaySortKeys(fc: FeatureCollection): FeatureCollection {
+  return produce(fc, (draft) => {
+    draft.features.forEach((f, i) => {
+      f.properties ??= {};
+      f.properties.sort_key = displaySortKey(i, f.properties.type, fc.features);
+    });
+  });
+}
+
 export const MapContext = createContext<MapContextType | undefined>(undefined);
 
 export const MapContextProvider = ({id, children}: {id: string; children: React.ReactNode}) => {
   // Note that here is where we keep the correct order of features (mapbox-gl-draw doesn't maintain it).
-  const [features, setFeaturesImmer] = useImmer<FeatureCollection>({type: 'FeatureCollection', features: []});
+  const [features, setFeaturesImmer] = useImmer<FeatureCollection>(featureCollection([]));
   const [editMode, setEditMode] = useState(false);
   const [drawMode, setDrawMode] = useState<DrawMode>(MapboxDraw.constants.modes.STATIC);
   const [drawWorkflow, setDrawWorkflow] = useImmer<Workflow | null>(null);

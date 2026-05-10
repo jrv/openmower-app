@@ -18,6 +18,9 @@ export const drawStyles = [
     id: 'polygon-fill',
     type: 'fill',
     filter: ['all', ['==', '$type', 'Polygon']],
+    layout: {
+      'fill-sort-key': ['to-number', ['get', 'user_sort_key'], 0],
+    },
     paint: {
       'fill-color': type_color,
       'fill-outline-color': type_color,
@@ -35,6 +38,7 @@ export const drawStyles = [
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
+      'line-sort-key': ['to-number', ['get', 'user_sort_key'], 0],
     },
     paint: {
       'line-color': [

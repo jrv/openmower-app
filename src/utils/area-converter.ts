@@ -9,6 +9,7 @@ import {
   type UtmPoint,
 } from '@/utils/coordinates';
 import area from '@turf/area';
+import {featureCollection, polygon} from '@turf/helpers';
 import type {Feature, FeatureCollection, Polygon} from 'geojson';
 import {produce} from 'immer';
 
@@ -26,15 +27,7 @@ function dedupePoints(points: RelativePoint[]): RelativePoint[] {
 }
 
 function areaToFeature(area: Area, datum: UtmPoint): Feature<Polygon, AreaProps> {
-  return {
-    type: 'Feature',
-    id: area.id,
-    properties: area.properties,
-    geometry: {
-      type: 'Polygon',
-      coordinates: [pointsToAbsolute(dedupePoints(area.outline), datum)],
-    },
-  };
+  return polygon([pointsToAbsolute(dedupePoints(area.outline), datum)], area.properties, {id: area.id});
 }
 
 function featureToArea(feature: AreaFeature, datum: UtmPoint): Area {
@@ -45,20 +38,16 @@ function featureToArea(feature: AreaFeature, datum: UtmPoint): Area {
   };
 }
 
-
 function convertDatum(datum: {lat: number; long: number}) {
   return datumToRelative([datum.long, datum.lat]);
 }
 
 export function mapToFeatures(map?: MapData): FeatureCollection {
   if (!map) {
-    return {type: 'FeatureCollection', features: []};
+    return featureCollection([]);
   }
   const datum = convertDatum(map.datum ?? fallbackDatum);
-  return {
-    type: 'FeatureCollection',
-    features: [...map.areas.map((area) => areaToFeature(area, datum))],
-  };
+  return featureCollection(map.areas.map((area) => areaToFeature(area, datum)));
 }
 
 export function featuresToMap(map: MapData, features: FeatureCollection) {

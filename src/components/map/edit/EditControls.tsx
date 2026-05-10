@@ -1,8 +1,8 @@
-import {useMapboxDraw, useMapContext, useMapSelection} from '@/contexts/MapContext';
-import {useTheme} from '@mui/material';
+import {withDisplaySortKeys, useMapboxDraw, useMapContext, useMapSelection} from '@/contexts/MapContext';
 import type {AreaFeature} from '@/types/geojson';
 import {removeMiniCoords} from '@/utils/area-utils';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import {useTheme} from '@mui/material';
 import {difference} from '@turf/difference';
 import {featureCollection} from '@turf/helpers';
 import {union} from '@turf/union';
@@ -87,7 +87,7 @@ export default function EditControls({
         if (removeOtherAreas) {
           draft.features = draft.features.filter((f) => !selectedIds.includes(f.id as string) || f.id === targetId);
         }
-        draw?.set(featureCollection(draft.features));
+        draw?.set(withDisplaySortKeys(featureCollection(draft.features)));
       });
     },
     [setFeatures, selectedIds, draw],
@@ -149,7 +149,7 @@ export default function EditControls({
         disabled={!canUndo}
         onClick={() => {
           const snapshot = undo();
-          if (snapshot) draw?.set(featureCollection(snapshot.features));
+          if (snapshot) draw?.set(withDisplaySortKeys(featureCollection(snapshot.features)));
         }}
       />
       <ControlButton
@@ -159,7 +159,7 @@ export default function EditControls({
         disabled={!canRedo}
         onClick={() => {
           const snapshot = redo();
-          if (snapshot) draw?.set(featureCollection(snapshot.features));
+          if (snapshot) draw?.set(withDisplaySortKeys(featureCollection(snapshot.features)));
         }}
       />
       <ControlButton

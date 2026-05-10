@@ -1,10 +1,11 @@
 // import {useMapContext} from '@/contexts/MapContext'; // TODO: Uncomment when implementing persistence
-import {useMapContext, useMapSelection} from '@/contexts/MapContext';
+import {withDisplaySortKeys, useMapboxDraw, useMapContext, useMapSelection} from '@/contexts/MapContext';
 import {AreaProps} from '@/stores/schemas';
 import {DndContext, DragEndEvent, DragOverlay} from '@dnd-kit/core';
 import {restrictToFirstScrollableAncestor, restrictToVerticalAxis} from '@dnd-kit/modifiers';
 import {arrayMove, SortableContext, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {Card, CardContent, CardHeader, List, useTheme} from '@mui/material';
+import {featureCollection} from '@turf/helpers';
 import {Feature, Polygon} from 'geojson';
 import SortableAreaItem from './edit/SortableAreaItem';
 
@@ -12,6 +13,7 @@ export default function AreasList({areas}: {areas: Feature<Polygon, AreaProps>[]
   const theme = useTheme();
   const selectedIds = useMapSelection();
   const {editMode, setFeatures} = useMapContext();
+  const draw = useMapboxDraw();
 
   const handleDragEnd = (event: DragEndEvent) => {
     const {active, over} = event;
@@ -20,6 +22,7 @@ export default function AreasList({areas}: {areas: Feature<Polygon, AreaProps>[]
         const oldIndex = draft.features.findIndex((item) => item.id === active.id);
         const newIndex = draft.features.findIndex((item) => item.id === over?.id);
         draft.features = arrayMove(draft.features, oldIndex, newIndex);
+        draw?.set(withDisplaySortKeys(featureCollection(draft.features)));
       });
     }
   };
