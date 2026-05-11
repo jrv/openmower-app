@@ -77,6 +77,7 @@ export default function AreaItem({
           </Typography>
           <Typography variant="caption" color="text.secondary">
             {formatAreaSize(turfArea(area.geometry))}
+            {typeof area.properties.outline_count === 'number' ? ` • Outlines: ${area.properties.outline_count}` : ''}
             {area.properties.type === 'mow' ? ' • Last mowed: Never' : ''}
           </Typography>
         </Box>
