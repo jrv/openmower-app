@@ -59,7 +59,7 @@ const areaSchema = z.object({
     name: z.string().optional(),
     type: z.enum(['mow', 'nav', 'obstacle', 'draft']).default('draft'),
     active: z.boolean().default(true),
-  }),
+  }).passthrough(),
   outline: polygonSchema,
 });
 export type Area = z.infer<typeof areaSchema>;
